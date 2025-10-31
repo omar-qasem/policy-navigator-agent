@@ -2,5 +2,6 @@ aixplain
 beautifulsoup4
 chromadb
 Flask
+flask-cors
 python-dotenv
 requests

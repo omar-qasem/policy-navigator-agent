@@ -4,6 +4,7 @@ Flask application with localhost capability
 """
 
 from flask import Flask, render_template, request, jsonify, session
+from flask_cors import CORS
 import os
 import sys
 import json
@@ -26,6 +27,7 @@ from src.data.ingest_data import DataIngestion
 from aixplain.factories import AgentFactory, TeamAgentFactory
 
 app = Flask(__name__)
+CORS(app)  # Enable CORS
 app.secret_key = os.urandom(24)
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
@@ -33,11 +35,15 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 document_processor = DocumentProcessor()
 federal_register = FederalRegisterTool()
 url_scraper = URLScraperTool()
-vector_store = VectorStore(persist_directory="../chroma_db")
-data_ingestion = DataIngestion(vector_store_path="../chroma_db")
+# Get absolute path to project root
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+CHROMA_DB_PATH = os.path.join(PROJECT_ROOT, "chroma_db")
+
+vector_store = VectorStore(persist_directory=CHROMA_DB_PATH)
+data_ingestion = DataIngestion(vector_store_path=CHROMA_DB_PATH)
 
 # Load agent IDs
-AGENT_IDS_FILE = "../agent_ids.json"
+AGENT_IDS_FILE = os.path.join(PROJECT_ROOT, "agent_ids.json")
 team_agent = None
 
 def load_agent():
@@ -125,9 +131,12 @@ def query():
         return jsonify({'error': str(e)}), 500
 
 
-@app.route('/api/upload', methods=['POST'])
+@app.route('/api/upload', methods=['POST', 'OPTIONS'])
 def upload_document():
     """Handle document uploads"""
+    if request.method == 'OPTIONS':
+        return '', 204
+    
     if 'file' not in request.files:
         return jsonify({'error': 'No file provided'}), 400
     
@@ -164,9 +173,12 @@ def upload_document():
         return jsonify({'error': str(e)}), 500
 
 
-@app.route('/api/scrape', methods=['POST'])
+@app.route('/api/scrape', methods=['POST', 'OPTIONS'])
 def scrape_url():
     """Handle URL scraping"""
+    if request.method == 'OPTIONS':
+        return '', 204
+    
     data = request.json
     url = data.get('url', '').strip()
     
