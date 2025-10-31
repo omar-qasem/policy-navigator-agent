@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Policy Navigator Agent</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header h1 {
+            color: #2d3748;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #718096;
+            font-size: 16px;
+        }
+        
+        .stats {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 8px;
+            flex: 1;
+        }
+        
+        .stat-card .label {
+            color: #718096;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .stat-card .value {
+            color: #2d3748;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card h2 {
+            color: #2d3748;
+            font-size: 20px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        .query-section {
+            grid-column: 1 / -1;
+        }
+        
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            background: #5568d3;
+        }
+        
+        button:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+        }
+        
+        .response-box {
+            background: #f7fafc;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            min-height: 200px;
+            max-height: 500px;
+            overflow-y: auto;
+            display: none;
+        }
+        
+        .response-box.show {
+            display: block;
+        }
+        
+        .response-box h3 {
+            color: #2d3748;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        .response-box .content {
+            color: #4a5568;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+        
+        .file-upload {
+            border: 2px dashed #cbd5e0;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .file-upload:hover {
+            border-color: #667eea;
+            background: #f7fafc;
+        }
+        
+        .file-upload input {
+            display: none;
+        }
+        
+        .file-upload .icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        
+        .url-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        
+        .url-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .message {
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+            display: none;
+        }
+        
+        .message.show {
+            display: block;
+        }
+        
+        .message.success {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+        
+        .message.error {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+        
+        .examples {
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        
+        .examples h4 {
+            color: #2d3748;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        
+        .examples ul {
+            list-style: none;
+        }
+        
+        .examples li {
+            color: #4a5568;
+            font-size: 13px;
+            padding: 5px 0;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        
+        .examples li:hover {
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏛️ Policy Navigator Agent</h1>
+            <p>Multi-Agent RAG System for US Government Regulations</p>
+            
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="label">Indexed Documents</div>
+                    <div class="value" id="doc-count">{{ stats.total_documents or 0 }}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">Data Source</div>
+                    <div class="value" style="font-size: 16px;">CFR Title 40</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">Status</div>
+                    <div class="value" style="font-size: 16px; color: #48bb78;">Active</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="card query-section">
+                <h2>💬 Ask About Policies</h2>
+                <textarea id="query-input" placeholder="Ask a question about US government regulations...&#10;&#10;Example: What are the EPA air quality standards for particulate matter?"></textarea>
+                <button id="query-btn" onclick="submitQuery()">Submit Query</button>
+                
+                <div class="examples">
+                    <h4>Example Questions:</h4>
+                    <ul>
+                        <li onclick="setQuery(this)">What are the EPA air quality standards?</li>
+                        <li onclick="setQuery(this)">Tell me about 40 CFR Part 60</li>
+                        <li onclick="setQuery(this)">What regulations apply to new stationary sources?</li>
+                        <li onclick="setQuery(this)">What is the EPA's authority under the Clean Air Act?</li>
+                    </ul>
+                </div>
+                
+                <div id="response-box" class="response-box">
+                    <h3>Response:</h3>
+                    <div class="content" id="response-content"></div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>📄 Upload Document</h2>
+                <div class="file-upload" onclick="document.getElementById('file-input').click()">
+                    <div class="icon">📁</div>
+                    <p>Click to upload policy document</p>
+                    <p style="font-size: 12px; color: #718096; margin-top: 5px;">Supports XML, TXT files</p>
+                    <input type="file" id="file-input" accept=".xml,.txt" onchange="uploadFile()">
+                </div>
+                <div id="upload-message" class="message"></div>
+            </div>
+            
+            <div class="card">
+                <h2>🌐 Extract from URL</h2>
+                <input type="url" id="url-input" class="url-input" placeholder="https://www.epa.gov/...">
+                <button id="scrape-btn" onclick="scrapeUrl()">Extract Content</button>
+                <div id="scrape-message" class="message"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function setQuery(element) {
+            document.getElementById('query-input').value = element.textContent;
+        }
+        
+        async function submitQuery() {
+            const query = document.getElementById('query-input').value.trim();
+            if (!query) {
+                alert('Please enter a question');
+                return;
+            }
+            
+            const btn = document.getElementById('query-btn');
+            const responseBox = document.getElementById('response-box');
+            const responseContent = document.getElementById('response-content');
+            
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span> Processing...';
+            responseBox.classList.remove('show');
+            
+            try {
+                const response = await fetch('/api/query', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({query: query})
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    responseContent.textContent = data.answer;
+                    responseBox.classList.add('show');
+                } else {
+                    alert('Error: ' + (data.error || 'Unknown error'));
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Submit Query';
+            }
+        }
+        
+        async function uploadFile() {
+            const fileInput = document.getElementById('file-input');
+            const file = fileInput.files[0];
+            
+            if (!file) return;
+            
+            const message = document.getElementById('upload-message');
+            message.textContent = 'Uploading and processing...';
+            message.className = 'message show';
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            try {
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    message.textContent = data.message;
+                    message.className = 'message success show';
+                    updateStats();
+                } else {
+                    message.textContent = 'Error: ' + (data.error || 'Upload failed');
+                    message.className = 'message error show';
+                }
+            } catch (error) {
+                message.textContent = 'Error: ' + error.message;
+                message.className = 'message error show';
+            }
+            
+            fileInput.value = '';
+        }
+        
+        async function scrapeUrl() {
+            const url = document.getElementById('url-input').value.trim();
+            if (!url) {
+                alert('Please enter a URL');
+                return;
+            }
+            
+            const btn = document.getElementById('scrape-btn');
+            const message = document.getElementById('scrape-message');
+            
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span> Scraping...';
+            message.classList.remove('show');
+            
+            try {
+                const response = await fetch('/api/scrape', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({url: url})
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    message.textContent = data.message;
+                    message.className = 'message success show';
+                    updateStats();
+                } else {
+                    message.textContent = 'Error: ' + (data.error || 'Scraping failed');
+                    message.className = 'message error show';
+                }
+            } catch (error) {
+                message.textContent = 'Error: ' + error.message;
+                message.className = 'message error show';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Extract Content';
+            }
+        }
+        
+        async function updateStats() {
+            try {
+                const response = await fetch('/api/stats');
+                const data = await response.json();
+                document.getElementById('doc-count').textContent = data.total_documents || 0;
+            } catch (error) {
+                console.error('Error updating stats:', error);
+            }
+        }
+        
+        // Allow Enter key to submit query
+        document.getElementById('query-input').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                submitQuery();
+            }
+        });
+    </script>
+</body>
+</html>

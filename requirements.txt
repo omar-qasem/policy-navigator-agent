@@ -1,0 +1,6 @@
+aixplain
+beautifulsoup4
+chromadb
+Flask
+python-dotenv
+requests
