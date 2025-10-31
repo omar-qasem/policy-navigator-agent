@@ -73,7 +73,14 @@ def load_agent():
 @app.route('/')
 def index():
     """Main page"""
-    stats = vector_store.get_collection_stats()
+    try:
+        stats = vector_store.get_collection_stats()
+        if not stats:
+            stats = {'total_documents': 0, 'collection_name': 'policy_documents', 'persist_directory': CHROMA_DB_PATH}
+    except Exception as e:
+        print(f"Error getting stats: {str(e)}")
+        stats = {'total_documents': 0, 'collection_name': 'policy_documents', 'persist_directory': CHROMA_DB_PATH}
+    
     return render_template('index.html', stats=stats)
 
 

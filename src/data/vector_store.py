@@ -180,7 +180,11 @@ class VectorStore:
             }
         except Exception as e:
             print(f"Error getting collection stats: {str(e)}")
-            return {}
+            return {
+                'total_documents': 0,
+                'collection_name': 'policy_documents',
+                'persist_directory': self.persist_directory
+            }
     
     def delete_collection(self):
         """Delete the entire collection"""
