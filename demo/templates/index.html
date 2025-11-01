@@ -3,462 +3,782 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Policy Navigator Agent</title>
+    <title>Policy Navigator Agent - AI-Powered Regulatory Intelligence</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
+        :root {
+            --bg-primary: #0a0e1a;
+            --bg-secondary: #151b2d;
+            --bg-card: #1a2332;
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --accent-primary: #10b981;
+            --accent-secondary: #3b82f6;
+            --accent-gradient: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
+            --border-color: rgba(148, 163, 184, 0.1);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+        }
+
+        body.light-mode {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-card: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border-color: rgba(15, 23, 42, 0.1);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            overflow-x: hidden;
         }
-        
-        .container {
-            max-width: 1200px;
+
+        /* Animated background gradient */
+        .bg-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.15;
+            background: radial-gradient(circle at 20% 50%, rgba(16, 185, 129, 0.3) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.3) 0%, transparent 50%),
+                        radial-gradient(circle at 40% 90%, rgba(139, 92, 246, 0.2) 0%, transparent 50%);
+            animation: gradientShift 15s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(5deg); }
+        }
+
+        /* Header */
+        header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow);
+        }
+
+        nav {
+            max-width: 1400px;
             margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        
-        .header {
-            background: white;
-            border-radius: 12px;
-            padding: 30px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
         }
-        
-        .header h1 {
-            color: #2d3748;
-            font-size: 32px;
-            margin-bottom: 10px;
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
         }
-        
-        .header p {
-            color: #718096;
-            font-size: 16px;
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
         }
-        
+
+        .nav-links a:hover {
+            color: var(--accent-primary);
+        }
+
+        /* Theme toggle */
+        .theme-toggle {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 50px;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+        }
+
+        .theme-icon {
+            font-size: 1.2rem;
+        }
+
+        /* Hero section */
+        .hero {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 6rem 2rem 4rem;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+            letter-spacing: -2px;
+        }
+
+        .hero h1 .gradient-text {
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto 2rem;
+        }
+
         .stats {
             display: flex;
-            gap: 15px;
-            margin-top: 20px;
+            justify-content: center;
+            gap: 3rem;
+            margin-top: 3rem;
         }
-        
-        .stat-card {
-            background: #f7fafc;
-            padding: 15px;
-            border-radius: 8px;
-            flex: 1;
+
+        .stat-item {
+            text-align: center;
         }
-        
-        .stat-card .label {
-            color: #718096;
-            font-size: 14px;
-            margin-bottom: 5px;
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
-        
-        .stat-card .value {
-            color: #2d3748;
-            font-size: 24px;
-            font-weight: bold;
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-        
-        .main-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
+
+        /* Main container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
         }
-        
+
+        /* Card styles */
         .card {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
         }
-        
-        .card h2 {
-            color: #2d3748;
-            font-size: 20px;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #e2e8f0;
+
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-4px);
         }
-        
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .card-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--accent-gradient);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        /* Query section */
         .query-section {
-            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
         }
-        
+
         textarea {
             width: 100%;
-            padding: 12px;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 14px;
+            min-height: 120px;
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 1rem;
             font-family: inherit;
             resize: vertical;
-            min-height: 100px;
+            transition: all 0.3s ease;
         }
-        
+
         textarea:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
         }
-        
-        button {
-            background: #667eea;
-            color: white;
+
+        /* Buttons */
+        .btn {
+            padding: 0.875rem 2rem;
             border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-size: 14px;
+            border-radius: 12px;
+            font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: background 0.3s;
-            margin-top: 10px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
         }
-        
-        button:hover {
-            background: #5568d3;
+
+        .btn-primary {
+            background: var(--accent-gradient);
+            color: white;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
         }
-        
-        button:disabled {
-            background: #cbd5e0;
-            cursor: not-allowed;
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
         }
-        
-        .response-box {
-            background: #f7fafc;
-            border-radius: 8px;
-            padding: 20px;
-            margin-top: 20px;
-            min-height: 200px;
-            max-height: 500px;
-            overflow-y: auto;
-            display: none;
+
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
         }
-        
-        .response-box.show {
-            display: block;
+
+        .btn-secondary:hover {
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
         }
-        
-        .response-box h3 {
-            color: #2d3748;
-            font-size: 16px;
-            margin-bottom: 10px;
-        }
-        
-        .response-box .content {
-            color: #4a5568;
-            line-height: 1.6;
-            white-space: pre-wrap;
-        }
-        
-        .file-upload {
-            border: 2px dashed #cbd5e0;
-            border-radius: 8px;
-            padding: 30px;
+
+        /* Upload area */
+        .upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 3rem 2rem;
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
+            background: var(--bg-secondary);
         }
-        
-        .file-upload:hover {
-            border-color: #667eea;
-            background: #f7fafc;
+
+        .upload-area:hover {
+            border-color: var(--accent-primary);
+            background: var(--bg-card);
         }
-        
-        .file-upload input {
-            display: none;
+
+        .upload-area.dragover {
+            border-color: var(--accent-primary);
+            background: rgba(16, 185, 129, 0.1);
         }
-        
-        .file-upload .icon {
-            font-size: 48px;
-            margin-bottom: 10px;
+
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
         }
-        
-        .url-input {
+
+        /* Input fields */
+        input[type="text"],
+        input[type="url"] {
             width: 100%;
-            padding: 12px;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 14px;
-            margin-bottom: 10px;
+            padding: 0.875rem 1rem;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s ease;
         }
-        
-        .url-input:focus {
+
+        input:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
         }
-        
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s ease-in-out infinite;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        .message {
-            padding: 12px;
-            border-radius: 8px;
-            margin-top: 10px;
+
+        /* Response area */
+        .response {
+            background: var(--bg-secondary);
+            border-left: 4px solid var(--accent-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
             display: none;
         }
-        
-        .message.show {
+
+        .response.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Loading spinner */
+        .spinner {
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--accent-primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 2rem auto;
+            display: none;
+        }
+
+        .spinner.show {
             display: block;
         }
-        
-        .message.success {
-            background: #c6f6d5;
-            color: #22543d;
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
-        
-        .message.error {
-            background: #fed7d7;
-            color: #742a2a;
+
+        /* Grid layout */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
         }
-        
+
+        /* Examples */
         .examples {
-            background: #f7fafc;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 15px;
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
         }
-        
-        .examples h4 {
-            color: #2d3748;
-            font-size: 14px;
-            margin-bottom: 10px;
-        }
-        
-        .examples ul {
-            list-style: none;
-        }
-        
-        .examples li {
-            color: #4a5568;
-            font-size: 13px;
-            padding: 5px 0;
+
+        .example-chip {
+            padding: 0.5rem 1rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            font-size: 0.875rem;
             cursor: pointer;
-            transition: color 0.3s;
+            transition: all 0.3s ease;
         }
-        
-        .examples li:hover {
-            color: #667eea;
+
+        .example-chip:hover {
+            background: var(--accent-gradient);
+            color: white;
+            border-color: transparent;
+            transform: translateY(-2px);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .stats {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Success message */
+        .success-message {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--accent-primary);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid #ef4444;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-top: 1rem;
+            color: #ef4444;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+            animation: slideIn 0.3s ease;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🏛️ Policy Navigator Agent</h1>
-            <p>Multi-Agent RAG System for US Government Regulations</p>
-            
-            <div class="stats">
-                <div class="stat-card">
-                    <div class="label">Indexed Documents</div>
-                    <div class="value" id="doc-count">{{ stats.total_documents or 0 }}</div>
+    <div class="bg-gradient"></div>
+    
+    <header>
+        <nav>
+            <div class="logo">🏛️ Policy Navigator</div>
+            <div class="nav-links">
+                <a href="#query">Query</a>
+                <a href="#upload">Upload</a>
+                <a href="#scrape">Extract</a>
+                <div class="theme-toggle" onclick="toggleTheme()">
+                    <span class="theme-icon" id="theme-icon">🌙</span>
+                    <span id="theme-text">Dark</span>
                 </div>
-                <div class="stat-card">
-                    <div class="label">Data Source</div>
-                    <div class="value" style="font-size: 16px;">CFR Title 40</div>
-                </div>
-                <div class="stat-card">
-                    <div class="label">Status</div>
-                    <div class="value" style="font-size: 16px; color: #48bb78;">Active</div>
-                </div>
+            </div>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <h1>
+            Navigate US Government<br>
+            <span class="gradient-text">Regulations with AI</span>
+        </h1>
+        <p>
+            Intelligent search across thousands of federal regulations, powered by advanced RAG technology
+            and real-time API integration with the Federal Register.
+        </p>
+        
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-value" id="doc-count">{{ stats.total_documents or 0 }}</div>
+                <div class="stat-label">Documents Indexed</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">CFR 40</div>
+                <div class="stat-label">Environmental Protection</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">Real-time</div>
+                <div class="stat-label">Federal Register API</div>
             </div>
         </div>
-        
-        <div class="main-content">
-            <div class="card query-section">
-                <h2>💬 Ask About Policies</h2>
-                <textarea id="query-input" placeholder="Ask a question about US government regulations...&#10;&#10;Example: What are the EPA air quality standards for particulate matter?"></textarea>
-                <button id="query-btn" onclick="submitQuery()">Submit Query</button>
-                
-                <div class="examples">
-                    <h4>Example Questions:</h4>
-                    <ul>
-                        <li onclick="setQuery(this)">What are the EPA air quality standards?</li>
-                        <li onclick="setQuery(this)">Tell me about 40 CFR Part 60</li>
-                        <li onclick="setQuery(this)">What regulations apply to new stationary sources?</li>
-                        <li onclick="setQuery(this)">What is the EPA's authority under the Clean Air Act?</li>
-                    </ul>
-                </div>
-                
-                <div id="response-box" class="response-box">
-                    <h3>Response:</h3>
-                    <div class="content" id="response-content"></div>
-                </div>
+    </section>
+
+    <div class="container">
+        <!-- Query Section -->
+        <div class="card" id="query">
+            <div class="card-title">
+                <div class="card-icon">💬</div>
+                Ask a Question
+            </div>
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+                Query our comprehensive database of US government regulations and policies
+            </p>
+            
+            <textarea id="query-input" placeholder="e.g., What are the EPA air quality standards for particulate matter?"></textarea>
+            
+            <div class="examples">
+                <div class="example-chip" onclick="setExample('What are the EPA air quality standards?')">EPA Air Quality</div>
+                <div class="example-chip" onclick="setExample('Tell me about 40 CFR Part 60')">40 CFR Part 60</div>
+                <div class="example-chip" onclick="setExample('What regulations apply to new stationary sources?')">New Stationary Sources</div>
             </div>
             
-            <div class="card">
-                <h2>📄 Upload Document</h2>
-                <div class="file-upload" onclick="document.getElementById('file-input').click()">
-                    <div class="icon">📁</div>
-                    <p>Click to upload policy document</p>
-                    <p style="font-size: 12px; color: #718096; margin-top: 5px;">Supports XML, TXT files</p>
-                    <input type="file" id="file-input" accept=".xml,.txt" onchange="uploadFile()">
-                </div>
-                <div id="upload-message" class="message"></div>
-            </div>
+            <button class="btn btn-primary" onclick="submitQuery()" style="margin-top: 1.5rem;">
+                <span>Submit Query</span>
+                <span>→</span>
+            </button>
             
-            <div class="card">
-                <h2>🌐 Extract from URL</h2>
-                <input type="url" id="url-input" class="url-input" placeholder="https://www.epa.gov/...">
-                <button id="scrape-btn" onclick="scrapeUrl()">Extract Content</button>
-                <div id="scrape-message" class="message"></div>
+            <div class="spinner" id="query-spinner"></div>
+            <div class="response" id="query-response"></div>
+        </div>
+
+        <!-- Upload and Scrape Grid -->
+        <div class="grid">
+            <!-- Upload Section -->
+            <div class="card" id="upload">
+                <div class="card-title">
+                    <div class="card-icon">📄</div>
+                    Upload Documents
+                </div>
+                <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+                    Upload policy documents (XML, TXT) to expand the knowledge base
+                </p>
+                
+                <div class="upload-area" id="upload-area" onclick="document.getElementById('file-input').click()">
+                    <div class="upload-icon">📁</div>
+                    <div style="font-weight: 600; margin-bottom: 0.5rem;">Click to upload or drag and drop</div>
+                    <div style="color: var(--text-secondary); font-size: 0.875rem;">XML, TXT files (max 16MB)</div>
+                </div>
+                <input type="file" id="file-input" accept=".xml,.txt" style="display: none;" onchange="uploadFile()">
+                
+                <div class="spinner" id="upload-spinner"></div>
+                <div class="success-message" id="upload-success"></div>
+                <div class="error-message" id="upload-error"></div>
+            </div>
+
+            <!-- Scrape Section -->
+            <div class="card" id="scrape">
+                <div class="card-title">
+                    <div class="card-icon">🌐</div>
+                    Extract from URL
+                </div>
+                <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+                    Scrape and index content from government websites
+                </p>
+                
+                <input type="url" id="url-input" placeholder="https://www.epa.gov/regulations" style="margin-bottom: 1rem;">
+                
+                <button class="btn btn-secondary" onclick="scrapeURL()" style="width: 100%;">
+                    <span>Extract Content</span>
+                    <span>→</span>
+                </button>
+                
+                <div class="spinner" id="scrape-spinner"></div>
+                <div class="success-message" id="scrape-success"></div>
+                <div class="error-message" id="scrape-error"></div>
             </div>
         </div>
     </div>
-    
+
     <script>
-        function setQuery(element) {
-            document.getElementById('query-input').value = element.textContent;
+        // Theme toggle
+        function toggleTheme() {
+            const body = document.body;
+            const icon = document.getElementById('theme-icon');
+            const text = document.getElementById('theme-text');
+            
+            body.classList.toggle('light-mode');
+            
+            if (body.classList.contains('light-mode')) {
+                icon.textContent = '☀️';
+                text.textContent = 'Light';
+                localStorage.setItem('theme', 'light');
+            } else {
+                icon.textContent = '🌙';
+                text.textContent = 'Dark';
+                localStorage.setItem('theme', 'dark');
+            }
         }
-        
+
+        // Load saved theme
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-mode');
+                document.getElementById('theme-icon').textContent = '☀️';
+                document.getElementById('theme-text').textContent = 'Light';
+            }
+        });
+
+        // Set example query
+        function setExample(text) {
+            document.getElementById('query-input').value = text;
+        }
+
+        // Submit query
         async function submitQuery() {
             const query = document.getElementById('query-input').value.trim();
-            if (!query) {
-                alert('Please enter a question');
-                return;
-            }
+            if (!query) return;
+
+            const spinner = document.getElementById('query-spinner');
+            const response = document.getElementById('query-response');
             
-            const btn = document.getElementById('query-btn');
-            const responseBox = document.getElementById('response-box');
-            const responseContent = document.getElementById('response-content');
-            
-            btn.disabled = true;
-            btn.innerHTML = '<span class="loading"></span> Processing...';
-            responseBox.classList.remove('show');
-            
+            spinner.classList.add('show');
+            response.classList.remove('show');
+
             try {
-                const response = await fetch('/api/query', {
+                const res = await fetch('/api/query', {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({query: query})
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query })
                 });
+
+                const data = await res.json();
                 
-                const data = await response.json();
-                
-                if (response.ok) {
-                    responseContent.textContent = data.answer;
-                    responseBox.classList.add('show');
+                if (data.error) {
+                    response.innerHTML = `<div style="color: #ef4444;">Error: ${data.error}</div>`;
                 } else {
-                    alert('Error: ' + (data.error || 'Unknown error'));
+                    response.innerHTML = `
+                        <div style="font-weight: 600; margin-bottom: 0.5rem;">Response:</div>
+                        <div style="white-space: pre-wrap;">${data.answer}</div>
+                        <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color); color: var(--text-secondary); font-size: 0.875rem;">
+                            Source: ${data.source}
+                        </div>
+                    `;
                 }
+                
+                response.classList.add('show');
             } catch (error) {
-                alert('Error: ' + error.message);
+                response.innerHTML = `<div style="color: #ef4444;">Error: ${error.message}</div>`;
+                response.classList.add('show');
             } finally {
-                btn.disabled = false;
-                btn.textContent = 'Submit Query';
+                spinner.classList.remove('show');
             }
         }
-        
+
+        // Upload file
         async function uploadFile() {
             const fileInput = document.getElementById('file-input');
             const file = fileInput.files[0];
-            
             if (!file) return;
+
+            const spinner = document.getElementById('upload-spinner');
+            const success = document.getElementById('upload-success');
+            const error = document.getElementById('upload-error');
             
-            const message = document.getElementById('upload-message');
-            message.textContent = 'Uploading and processing...';
-            message.className = 'message show';
-            
+            spinner.classList.add('show');
+            success.classList.remove('show');
+            error.classList.remove('show');
+
             const formData = new FormData();
             formData.append('file', file);
-            
+
             try {
-                const response = await fetch('/api/upload', {
+                const res = await fetch('/api/upload', {
                     method: 'POST',
                     body: formData
                 });
+
+                const data = await res.json();
                 
-                const data = await response.json();
-                
-                if (response.ok) {
-                    message.textContent = data.message;
-                    message.className = 'message success show';
-                    updateStats();
+                if (data.error) {
+                    error.textContent = `Error: ${data.error}`;
+                    error.classList.add('show');
                 } else {
-                    message.textContent = 'Error: ' + (data.error || 'Upload failed');
-                    message.className = 'message error show';
+                    success.innerHTML = `✓ ${data.message}`;
+                    success.classList.add('show');
+                    // Update document count
+                    document.getElementById('doc-count').textContent = parseInt(document.getElementById('doc-count').textContent) + (data.sections || 0);
                 }
-            } catch (error) {
-                message.textContent = 'Error: ' + error.message;
-                message.className = 'message error show';
-            }
-            
-            fileInput.value = '';
-        }
-        
-        async function scrapeUrl() {
-            const url = document.getElementById('url-input').value.trim();
-            if (!url) {
-                alert('Please enter a URL');
-                return;
-            }
-            
-            const btn = document.getElementById('scrape-btn');
-            const message = document.getElementById('scrape-message');
-            
-            btn.disabled = true;
-            btn.innerHTML = '<span class="loading"></span> Scraping...';
-            message.classList.remove('show');
-            
-            try {
-                const response = await fetch('/api/scrape', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({url: url})
-                });
-                
-                const data = await response.json();
-                
-                if (response.ok) {
-                    message.textContent = data.message;
-                    message.className = 'message success show';
-                    updateStats();
-                } else {
-                    message.textContent = 'Error: ' + (data.error || 'Scraping failed');
-                    message.className = 'message error show';
-                }
-            } catch (error) {
-                message.textContent = 'Error: ' + error.message;
-                message.className = 'message error show';
+            } catch (err) {
+                error.textContent = `Error: ${err.message}`;
+                error.classList.add('show');
             } finally {
-                btn.disabled = false;
-                btn.textContent = 'Extract Content';
+                spinner.classList.remove('show');
+                fileInput.value = '';
             }
         }
-        
-        async function updateStats() {
+
+        // Scrape URL
+        async function scrapeURL() {
+            const url = document.getElementById('url-input').value.trim();
+            if (!url) return;
+
+            const spinner = document.getElementById('scrape-spinner');
+            const success = document.getElementById('scrape-success');
+            const error = document.getElementById('scrape-error');
+            
+            spinner.classList.add('show');
+            success.classList.remove('show');
+            error.classList.remove('show');
+
             try {
-                const response = await fetch('/api/stats');
-                const data = await response.json();
-                document.getElementById('doc-count').textContent = data.total_documents || 0;
-            } catch (error) {
-                console.error('Error updating stats:', error);
+                const res = await fetch('/api/scrape', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url })
+                });
+
+                const data = await res.json();
+                
+                if (data.error) {
+                    error.textContent = `Error: ${data.error}`;
+                    error.classList.add('show');
+                } else {
+                    success.innerHTML = `✓ ${data.message}`;
+                    success.classList.add('show');
+                    // Update document count
+                    document.getElementById('doc-count').textContent = parseInt(document.getElementById('doc-count').textContent) + (data.sections || 0);
+                }
+            } catch (err) {
+                error.textContent = `Error: ${err.message}`;
+                error.classList.add('show');
+            } finally {
+                spinner.classList.remove('show');
             }
         }
+
+        // Drag and drop
+        const uploadArea = document.getElementById('upload-area');
         
-        // Allow Enter key to submit query
-        document.getElementById('query-input').addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && e.ctrlKey) {
-                submitQuery();
-            }
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, preventDefaults, false);
         });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, () => uploadArea.classList.add('dragover'), false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, () => uploadArea.classList.remove('dragover'), false);
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            document.getElementById('file-input').files = files;
+            uploadFile();
+        }, false);
     </script>
 </body>
 </html>
