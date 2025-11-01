@@ -20,7 +20,7 @@ from src.tools.document_processor import DocumentProcessor
 from src.tools.federal_register_tool import FederalRegisterTool
 from src.tools.url_scraper_tool import URLScraperTool
 from dotenv import load_dotenv
-import aixplain.api.client as client
+from aixplain.factories import ModelFactory
 
 # Load environment variables
 load_dotenv(os.path.join(PROJECT_ROOT, '.env'))
@@ -97,8 +97,8 @@ Based on the above documents, provide a clear and concise answer to the question
 
 Answer:"""
             
-            # Use GPT-4 via aiXplain (asset ID for GPT-4)
-            model = client.Model('6646261c6eb563165658bbb1')  # GPT-4o-mini on aiXplain
+            # Use GPT-4 via aiXplain (asset ID for GPT-4o-mini)
+            model = ModelFactory.get('6646261c6eb563165658bbb1')  # GPT-4o-mini on aiXplain
             response = model.run(prompt)
             
             if hasattr(response, 'data') and response.data:
