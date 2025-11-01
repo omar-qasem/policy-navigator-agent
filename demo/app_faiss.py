@@ -12,10 +12,18 @@ import os
 # Add parent directory to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+# Get absolute path to project root
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 from src.data.faiss_vector_store import FAISSVectorStore
 from src.tools.document_processor import DocumentProcessor
 from src.tools.federal_register_tool import FederalRegisterTool
 from src.tools.url_scraper_tool import URLScraperTool
+from dotenv import load_dotenv
+import aixplain.api.client as client
+
+# Load environment variables
+load_dotenv(os.path.join(PROJECT_ROOT, '.env'))
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -26,8 +34,7 @@ document_processor = DocumentProcessor()
 federal_register = FederalRegisterTool()
 url_scraper = URLScraperTool()
 
-# Get absolute path to project root
-PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# FAISS database path
 FAISS_DB_PATH = os.path.join(PROJECT_ROOT, "faiss_db")
 
 # Initialize FAISS vector store
@@ -70,21 +77,48 @@ def query():
                 'query': user_query
             })
         
-        # Combine top results
+        # Combine top results for context
         context = "\n\n".join([
-            f"[{i+1}] {r['content'][:500]}..." 
+            f"Document {i+1} (from {r['metadata'].get('title', 'Unknown')}):\n{r['content'][:800]}"
             for i, r in enumerate(results)
         ])
         
-        # Format response
-        answer = f"Based on the policy documents:\n\n{context}\n\n"
-        answer += f"Top match (score: {results[0]['score']:.2f}): {results[0]['metadata'].get('title', 'Unknown')}"
+        # Use aiXplain LLM to generate answer
+        try:
+            # Create prompt for LLM
+            prompt = f"""You are a helpful assistant that answers questions about US government policies and regulations.
+
+Question: {user_query}
+
+Relevant policy documents:
+{context}
+
+Based on the above documents, provide a clear and concise answer to the question. If the documents don't contain enough information, say so.
+
+Answer:"""
+            
+            # Use GPT-4 via aiXplain (asset ID for GPT-4)
+            model = client.Model('6646261c6eb563165658bbb1')  # GPT-4o-mini on aiXplain
+            response = model.run(prompt)
+            
+            if hasattr(response, 'data') and response.data:
+                answer = response.data
+            else:
+                # Fallback to simple context if LLM fails
+                answer = f"Based on the retrieved documents:\n\n{context[:1000]}..."
+        
+        except Exception as llm_error:
+            print(f"LLM error: {str(llm_error)}")
+            # Fallback to simple context
+            answer = f"Based on the policy documents:\n\n{context[:1000]}...\n\n(Note: LLM processing unavailable, showing raw excerpts)"
         
         return jsonify({
             'answer': answer,
-            'source': f"FAISS Vector Database ({len(results)} documents)",
+            'source': f"FAISS Vector Database ({len(results)} documents) + aiXplain LLM",
             'query': user_query,
-            'num_results': len(results)
+            'num_results': len(results),
+            'top_match': results[0]['metadata'].get('title', 'Unknown'),
+            'confidence': f"{results[0]['score']:.2f}"
         })
     
     except Exception as e:
