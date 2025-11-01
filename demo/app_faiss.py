@@ -43,6 +43,34 @@ vector_store = FAISSVectorStore(persist_directory=FAISS_DB_PATH)
 print("✓ FAISS vector store ready")
 
 
+def generate_simple_answer(query, results):
+    """
+    Generate a simple answer from retrieved documents when LLM is unavailable.
+    Uses basic text processing to extract relevant information.
+    """
+    if not results:
+        return "I couldn't find any relevant information in the policy documents to answer your question."
+    
+    # Extract key sentences from top results
+    answer_parts = []
+    answer_parts.append(f"Based on the policy documents, here's what I found:\n")
+    
+    for i, result in enumerate(results[:3], 1):  # Use top 3 results
+        title = result['metadata'].get('title', 'Unknown Document')
+        content = result['content'][:500]  # First 500 chars
+        
+        # Clean up content
+        content = content.replace('\n', ' ').strip()
+        if len(content) > 400:
+            content = content[:400] + "..."
+        
+        answer_parts.append(f"\n**Document {i}: {title}**\n{content}")
+    
+    answer_parts.append(f"\n\n*Note: This is a simplified answer. For more detailed analysis, please ensure the LLM service is available.*")
+    
+    return "\n".join(answer_parts)
+
+
 @app.route('/')
 def index():
     """Main page"""
@@ -97,20 +125,44 @@ Based on the above documents, provide a clear and concise answer to the question
 
 Answer:"""
             
-            # Use GPT-4 via aiXplain (asset ID for GPT-4o-mini)
-            model = ModelFactory.get('6646261c6eb563165658bbb1')  # GPT-4o-mini on aiXplain
-            response = model.run(prompt)
+            # Use GPT-4o-mini via aiXplain
+            from aixplain.factories import ModelFactory
             
-            if hasattr(response, 'data') and response.data:
-                answer = response.data
-            else:
-                # Fallback to simple context if LLM fails
-                answer = f"Based on the retrieved documents:\n\n{context[:1000]}..."
+            # Try to get GPT-4o-mini model
+            try:
+                model = ModelFactory.get('6646261c6eb563165658bbb1')  # GPT-4o-mini
+                response = model.run(prompt)
+                
+                # Extract answer from response
+                if hasattr(response, 'data'):
+                    answer = response.data
+                elif hasattr(response, 'text'):
+                    answer = response.text
+                elif isinstance(response, dict) and 'data' in response:
+                    answer = response['data']
+                elif isinstance(response, str):
+                    answer = response
+                else:
+                    raise Exception(f"Unexpected response format: {type(response)}")
+                    
+            except Exception as model_error:
+                print(f"Model error: {str(model_error)}")
+                # Try alternative: use text completion with different model ID
+                try:
+                    # Try GPT-3.5-turbo as fallback
+                    model = ModelFactory.get('openai/gpt-3.5-turbo')
+                    response = model.run(prompt)
+                    answer = response.data if hasattr(response, 'data') else str(response)
+                except:
+                    # If all else fails, generate a simple answer from context
+                    answer = generate_simple_answer(user_query, results)
         
         except Exception as llm_error:
             print(f"LLM error: {str(llm_error)}")
-            # Fallback to simple context
-            answer = f"Based on the policy documents:\n\n{context[:1000]}...\n\n(Note: LLM processing unavailable, showing raw excerpts)"
+            import traceback
+            traceback.print_exc()
+            # Generate simple answer from context
+            answer = generate_simple_answer(user_query, results)
         
         return jsonify({
             'answer': answer,
