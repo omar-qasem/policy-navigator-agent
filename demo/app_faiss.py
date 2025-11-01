@@ -105,23 +105,30 @@ def query():
                 'query': user_query
             })
         
-        # Combine top results for context
+        # Build context from top results with more content
         context = "\n\n".join([
-            f"Document {i+1} (from {r['metadata'].get('title', 'Unknown')}):\n{r['content'][:800]}"
+            f"Document {i+1} (from {r['metadata'].get('title', 'Unknown')}):\n{r['content'][:2000]}"
             for i, r in enumerate(results)
         ])
         
         # Use aiXplain LLM to generate answer
         try:
-            # Create prompt for LLM
-            prompt = f"""You are a helpful assistant that answers questions about US government policies and regulations.
+            # Create improved prompt for LLM
+            prompt = f"""You are an expert assistant specializing in US government policies and regulations.
+
+IMPORTANT INSTRUCTIONS:
+- Read the ENTIRE document content carefully, including disclaimers and restrictions
+- Look for specific details, warnings, prohibitions, and requirements
+- Quote relevant sections when available
+- If information is found in the documents, provide a detailed answer
+- Only say "information not found" if you've thoroughly checked all documents
 
 Question: {user_query}
 
 Relevant policy documents:
 {context}
 
-Based on the above documents, provide a clear and concise answer to the question. If the documents don't contain enough information, say so.
+Provide a comprehensive answer based on the documents above. Include specific details, quotes, and citations when available.
 
 Answer:"""
             
