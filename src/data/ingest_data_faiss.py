@@ -96,7 +96,7 @@ def ingest_cfr_data(vector_store_path: str = "./faiss_db", reset: bool = False):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Ingest policy data into FAISS vector store')
     parser.add_argument('--reset', action='store_true', help='Reset the vector store before ingestion')
-    parser.add_argument('--path', type='str', default='./faiss_db', help='Path to FAISS database')
+    parser.add_argument('--path', type=str, default='./faiss_db', help='Path to FAISS database')
     
     args = parser.parse_args()
     
