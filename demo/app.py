@@ -288,7 +288,7 @@ def health():
 
 if __name__ == '__main__':
     # Check if running in production or development
-    port = int(os.environ.get('PORT', 5000))
+    port = int(os.environ.get('PORT', 5001))
     debug = os.environ.get('DEBUG', 'True').lower() == 'true'
     
     print("="*60)

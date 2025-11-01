@@ -26,12 +26,12 @@ REM Start Flask
 echo [3/3] Starting Flask server...
 echo.
 echo ============================================================
-echo Server will start on http://localhost:5000
+echo Server will start on http://localhost:5001
 echo Keep this window open!
 echo Press Ctrl+C to stop the server
 echo ============================================================
 echo.
 
-python app.py
+python start_server.py
 
 pause
