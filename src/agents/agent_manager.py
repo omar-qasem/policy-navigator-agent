@@ -4,9 +4,16 @@ Handles aiXplain Team Agent integration for multi-agent RAG system
 """
 
 import os
-from typing import Dict, Any, Optional
+import sys
+from typing import Dict, Any, Optional, List
 from aixplain.factories import AgentFactory
 from dotenv import load_dotenv
+
+# Add parent directory to path for imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
+from src.tools.courtlistener_tool import CourtListenerTool
+from src.tools.federal_register_tool import FederalRegisterTool
 
 
 class AgentManager:
@@ -32,6 +39,10 @@ class AgentManager:
         self.rag_agent = None
         self.api_agent = None
         self.scraper_agent = None
+        
+        # Initialize custom tools
+        self.courtlistener_tool = CourtListenerTool()  # Fallback mode (no API key)
+        self.federal_register_tool = FederalRegisterTool()
         
         self._load_agents()
     
@@ -202,18 +213,90 @@ Please answer the user's question based on the provided documents. If the docume
         except Exception as e:
             return {'success': False, 'error': str(e)}
     
+    def check_case_law(self, regulation: str, section: str = None) -> Dict[str, Any]:
+        """
+        Check if a regulation has been challenged in court using CourtListener.
+        
+        Args:
+            regulation: Regulation name (e.g., "Clean Air Act")
+            section: Optional section number (e.g., "Section 230")
+            
+        Returns:
+            Dictionary with case law information
+        """
+        try:
+            result = self.courtlistener_tool.check_regulation_challenges(regulation, section)
+            
+            if result.get('status') == 'success':
+                return {
+                    'success': True,
+                    'data': result,
+                    'formatted': self.courtlistener_tool.format_for_agent(result),
+                    'source': 'CourtListener API'
+                }
+            else:
+                return {
+                    'success': False,
+                    'error': result.get('error', 'Unknown error'),
+                    'source': 'CourtListener API'
+                }
+        
+        except Exception as e:
+            return {
+                'success': False,
+                'error': str(e),
+                'source': 'CourtListener API'
+            }
+    
+    def search_court_cases(self, query: str, limit: int = 10) -> Dict[str, Any]:
+        """
+        Search for court cases related to a query.
+        
+        Args:
+            query: Search query
+            limit: Maximum number of results
+            
+        Returns:
+            Dictionary with search results
+        """
+        try:
+            result = self.courtlistener_tool.search_opinions(query, limit=limit)
+            
+            if result.get('status') == 'success':
+                return {
+                    'success': True,
+                    'data': result,
+                    'formatted': self.courtlistener_tool.format_for_agent(result),
+                    'source': 'CourtListener API'
+                }
+            else:
+                return {
+                    'success': False,
+                    'error': result.get('error', 'Unknown error'),
+                    'source': 'CourtListener API'
+                }
+        
+        except Exception as e:
+            return {
+                'success': False,
+                'error': str(e),
+                'source': 'CourtListener API'
+            }
+    
     def get_agent_status(self) -> Dict[str, bool]:
         """
-        Get status of all agents
+        Get status of all agents and tools
         
         Returns:
-            Dictionary with agent availability status
+            Dictionary with agent and tool availability status
         """
         return {
             'team_agent': self.team_agent is not None,
             'rag_agent': self.rag_agent is not None,
             'api_agent': self.api_agent is not None,
-            'scraper_agent': self.scraper_agent is not None
+            'scraper_agent': self.scraper_agent is not None,
+            'courtlistener_tool': self.courtlistener_tool is not None,
+            'federal_register_tool': self.federal_register_tool is not None
         }
 
 
