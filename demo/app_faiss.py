@@ -191,7 +191,7 @@ def scrape_url():
         # Scrape URL
         result = url_scraper.scrape_url(url)
         
-        if result['success']:
+        if result.get('status') == 'success' and result.get('content'):
             # Add to vector store
             documents = [{
                 'content': result['content'],
