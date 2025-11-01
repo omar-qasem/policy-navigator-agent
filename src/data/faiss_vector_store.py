@@ -152,6 +152,23 @@ class FAISSVectorStore:
             'backend': 'FAISS'
         }
     
+    def clear_all(self):
+        """Clear all documents from the vector store"""
+        try:
+            # Reset index and metadata
+            self.index = faiss.IndexFlatL2(self.embedding_dim)
+            self.metadata = []
+            self.id_counter = 0
+            
+            # Save empty state to disk
+            self._save_index()
+            
+            print("All documents cleared successfully")
+            return True
+        except Exception as e:
+            print(f"Error clearing documents: {str(e)}")
+            return False
+    
     def delete_collection(self):
         """Delete the entire collection"""
         try:

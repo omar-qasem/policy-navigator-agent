@@ -303,6 +303,24 @@ def check_federal_register():
         return jsonify({'error': str(e)}), 500
 
 
+@app.route('/api/clear-all', methods=['POST'])
+def clear_all_documents():
+    """Clear all documents from the vector database"""
+    try:
+        success = vector_store.clear_all()
+        
+        if success:
+            return jsonify({
+                'message': 'All documents cleared successfully',
+                'status': 'success'
+            })
+        else:
+            return jsonify({'error': 'Failed to clear documents'}), 500
+    
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
 @app.route('/health')
 def health():
     """Health check endpoint"""

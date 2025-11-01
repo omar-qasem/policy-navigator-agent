@@ -37,3 +37,4 @@ Thumbs.db
 
 # Agent IDs (contains sensitive information)
 agent_ids.json
+faiss_db/

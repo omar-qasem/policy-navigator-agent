@@ -593,6 +593,26 @@
                 <div class="error-message" id="scrape-error"></div>
             </div>
         </div>
+
+        <!-- Database Management Section -->
+        <div class="card" style="margin-top: 2rem; border: 2px solid rgba(239, 68, 68, 0.3);">
+            <div class="card-title">
+                <div class="card-icon">🗑️</div>
+                Database Management
+            </div>
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+                Clear all documents from the vector database to free up space
+            </p>
+            
+            <button class="btn" onclick="clearAllDocuments()" style="width: 100%; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); border: none;">
+                <span>⚠️ Clear All Documents</span>
+                <span>🗑️</span>
+            </button>
+            
+            <div class="spinner" id="clear-spinner"></div>
+            <div class="success-message" id="clear-success"></div>
+            <div class="error-message" id="clear-error"></div>
+        </div>
     </div>
 
     <script>
@@ -744,6 +764,49 @@
                     success.classList.add('show');
                     // Update document count
                     document.getElementById('doc-count').textContent = parseInt(document.getElementById('doc-count').textContent) + (data.sections || 0);
+                }
+            } catch (err) {
+                error.textContent = `Error: ${err.message}`;
+                error.classList.add('show');
+            } finally {
+                spinner.classList.remove('show');
+            }
+        }
+
+        // Clear all documents
+        async function clearAllDocuments() {
+            // Show confirmation dialog
+            const confirmed = confirm(
+                '⚠️ WARNING: This will permanently delete ALL documents from the database!\n\n' +
+                'This action cannot be undone. Are you sure you want to continue?'
+            );
+            
+            if (!confirmed) return;
+            
+            const spinner = document.getElementById('clear-spinner');
+            const success = document.getElementById('clear-success');
+            const error = document.getElementById('clear-error');
+            
+            spinner.classList.add('show');
+            success.classList.remove('show');
+            error.classList.remove('show');
+
+            try {
+                const res = await fetch('/api/clear-all', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                const data = await res.json();
+                
+                if (data.error) {
+                    error.textContent = `Error: ${data.error}`;
+                    error.classList.add('show');
+                } else {
+                    success.innerHTML = `✓ ${data.message}`;
+                    success.classList.add('show');
+                    // Reset document count to 0
+                    document.getElementById('doc-count').textContent = '0';
                 }
             } catch (err) {
                 error.textContent = `Error: ${err.message}`;
