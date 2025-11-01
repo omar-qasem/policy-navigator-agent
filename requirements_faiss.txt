@@ -1,0 +1,19 @@
+# Core dependencies
+Flask==3.0.0
+flask-cors==4.0.0
+python-dotenv==1.0.0
+requests==2.31.0
+
+# FAISS vector database (instead of ChromaDB)
+faiss-cpu==1.7.4
+sentence-transformers==2.2.2
+
+# Document processing
+beautifulsoup4==4.12.2
+lxml==4.9.3
+
+# aiXplain SDK
+aixplain==0.3.0
+
+# Optional: For better performance
+numpy==1.24.3
