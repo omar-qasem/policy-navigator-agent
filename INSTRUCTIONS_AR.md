@@ -22,7 +22,7 @@ pip install faiss-cpu sentence-transformers flask flask-cors aixplain beautifuls
 ### 2. التأكد من وجود ملف `.env`
 يجب أن يحتوي على:
 ```
-AIXPLAIN_API_KEY=ada6267c2fbef32d4178f00df6462c7b1558d161790894ce51725f62309b3aa3
+AIXPLAIN_API_KEY 
 ```
 
 ## تشغيل الخادم
@@ -30,21 +30,21 @@ AIXPLAIN_API_KEY=ada6267c2fbef32d4178f00df6462c7b1558d161790894ce51725f62309b3aa
 ### الطريقة الصحيحة (مع تصدير API Key):
 ```bash
 cd policy-navigator-agent/demo
-export AIXPLAIN_API_KEY=ada6267c2fbef32d4178f00df6462c7b1558d161790894ce51725f62309b3aa3
+export AIXPLAIN_API_KEY=
 python app_faiss.py
 ```
 
 ### على Windows (PowerShell):
 ```powershell
 cd policy-navigator-agent\demo
-$env:AIXPLAIN_API_KEY="ada6267c2fbef32d4178f00df6462c7b1558d161790894ce51725f62309b3aa3"
+$env:AIXPLAIN_API_KEY=
 python app_faiss.py
 ```
 
 ### على Windows (CMD):
 ```cmd
 cd policy-navigator-agent\demo
-set AIXPLAIN_API_KEY=ada6267c2fbef32d4178f00df6462c7b1558d161790894ce51725f62309b3aa3
+set AIXPLAIN_API_KEY
 python app_faiss.py
 ```
 
@@ -142,7 +142,7 @@ venv\Scripts\activate
 pip install -r requirements.txt
 
 # تشغيل الخادم
-export AIXPLAIN_API_KEY=ada6267c2fbef32d4178f00df6462c7b1558d161790894ce51725f62309b3aa3
+export AIXPLAIN_API_KEY=
 python demo/app_faiss.py
 ```
 
@@ -153,6 +153,3 @@ python demo/app_faiss.py
 - Issues: https://github.com/omar-qasem/policy-navigator-agent/issues
 
 ---
-
-**تم التحديث**: نوفمبر 2025
-**النسخة**: 2.0 (مع الحفظ الدائم وزر Clear All)
