@@ -125,7 +125,3 @@ Once the web demo is running, you can interact with the agent in several ways:
 * **Ask a Question**: Type a question into the main text area and click "Submit Query."
 * **Upload a Document**: Click the upload area to select a local `.xml`, `.txt`, or `.pdf` file. The agent will process and index its content.
 * **Extract from URL**: Enter a public URL and click "Extract Content." The agent will scrape the page and add its text to the knowledge base.
-
----
-
-Would you like me to also include a **download button badge** (e.g., “📄 Download CFR Title 2 (2025)”) right below the data source table for better visibility on GitHub?
