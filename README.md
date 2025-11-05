@@ -1,9 +1,3 @@
-Here’s your updated README with the demo link added neatly under the **Usage** section for visibility 👇
-
----
-
-> This project was completed by **Manus AI** on October 31, 2025.
-
 # 🏛️ Policy Navigator Agent
 
 **A Multi-Agent RAG System for Navigating US Government Regulations**
