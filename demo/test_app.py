@@ -6,6 +6,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
 import sys
+import tempfile
 
 # Add parent directory to path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -47,7 +48,8 @@ def upload_document():
     
     try:
         # Save file temporarily
-        upload_dir = '/tmp/policy_uploads'
+        # Use tempfile.gettempdir() for cross-platform compatibility
+        upload_dir = os.path.join(tempfile.gettempdir(), 'policy_uploads')
         os.makedirs(upload_dir, exist_ok=True)
         
         # Use basename to handle Windows paths with backslashes

@@ -8,6 +8,7 @@ from flask_cors import CORS
 from datetime import datetime
 import sys
 import os
+import tempfile
 import PyPDF2
 
 # Add parent directory to path
@@ -199,8 +200,10 @@ def upload_file():
     try:
         # Save file temporarily
         # Use basename to handle Windows paths with backslashes
+        # Use tempfile.gettempdir() for cross-platform compatibility
         safe_filename = os.path.basename(file.filename)
-        temp_path = os.path.join('/tmp', safe_filename)
+        temp_dir = tempfile.gettempdir()
+        temp_path = os.path.join(temp_dir, safe_filename)
         file.save(temp_path)
         
         # Process based on file type

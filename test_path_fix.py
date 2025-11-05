@@ -6,33 +6,42 @@ Run this on your Windows machine to see the exact problem
 
 import os
 import sys
+import tempfile
 
 print("=" * 60)
-print("File Upload Path Diagnosis Tool")
+print("File Upload Path Diagnosis Tool v2")
 print("=" * 60)
 print()
 
-# Test 1: Check os.path.basename behavior
-print("Test 1: os.path.basename() behavior")
+# Test 1: Check tempfile.gettempdir()
+print("Test 1: tempfile.gettempdir() behavior")
+print("-" * 60)
+temp_dir = tempfile.gettempdir()
+print(f"System temp directory: {temp_dir}")
+print(f"Type: {type(temp_dir)}")
+print()
+
+# Test 2: Check path joining with tempfile
+print("Test 2: Path joining with tempfile.gettempdir()")
 print("-" * 60)
 
-test_paths = [
+test_filenames = [
     "CFR-2025-title2-vol1.pdf",
-    "C:\\Users\\Omar\\CFR-2025-title2-vol1.pdf",
-    "/tmp/CFR-2025-title2-vol1.pdf",
-    "folder\\subfolder\\file.pdf",
+    "test.xml",
+    "document.txt",
 ]
 
-for path in test_paths:
-    basename = os.path.basename(path)
-    result = os.path.join('/tmp', basename)
-    print(f"Input:  {path}")
-    print(f"Basename: {basename}")
-    print(f"Result: {result}")
+for filename in test_filenames:
+    safe_filename = os.path.basename(filename)
+    temp_path = os.path.join(temp_dir, safe_filename)
+    print(f"Filename: {filename}")
+    print(f"Basename: {safe_filename}")
+    print(f"Full path: {temp_path}")
+    print(f"Path exists: {os.path.exists(os.path.dirname(temp_path))}")
     print()
 
-# Test 2: Check which app file exists
-print("\nTest 2: Check which app files exist")
+# Test 3: Verify the fix is in place
+print("Test 3: Check which app files have the fix")
 print("-" * 60)
 
 app_files = [
@@ -43,43 +52,50 @@ app_files = [
 ]
 
 for app_file in app_files:
-    exists = os.path.exists(app_file)
-    status = "✓ EXISTS" if exists else "✗ NOT FOUND"
-    print(f"{app_file}: {status}")
+    if not os.path.exists(app_file):
+        print(f"{app_file}: ✗ NOT FOUND")
+        continue
+        
+    with open(app_file, 'r', encoding='utf-8') as f:
+        content = f.read()
+        
+    has_tempfile_import = 'import tempfile' in content
+    has_gettempdir = 'tempfile.gettempdir()' in content
+    has_hardcoded_tmp = "'/tmp'" in content or '"/tmp"' in content
     
-    if exists:
-        # Check if it has the fix
-        with open(app_file, 'r', encoding='utf-8') as f:
-            content = f.read()
-            has_basename = 'os.path.basename' in content
-            has_safe_filename = 'safe_filename' in content
-            
-            if has_basename and has_safe_filename:
-                print(f"  → ✓ HAS FIX (basename + safe_filename)")
-            elif has_basename:
-                print(f"  → ⚠ HAS basename but missing safe_filename variable")
-            else:
-                print(f"  → ✗ MISSING FIX (no basename)")
-print()
+    print(f"{app_file}:")
+    print(f"  ✓ import tempfile: {'YES' if has_tempfile_import else 'NO'}")
+    print(f"  ✓ tempfile.gettempdir(): {'YES' if has_gettempdir else 'NO'}")
+    print(f"  ✗ hardcoded /tmp: {'YES (BAD!)' if has_hardcoded_tmp else 'NO (GOOD!)'}")
+    
+    if has_tempfile_import and has_gettempdir and not has_hardcoded_tmp:
+        print(f"  → ✅ FULLY FIXED")
+    elif has_hardcoded_tmp:
+        print(f"  → ❌ STILL HAS HARDCODED /tmp")
+    else:
+        print(f"  → ⚠ PARTIALLY FIXED")
+    print()
 
-# Test 3: Show the exact line that should be in the code
-print("\nTest 3: Expected code in upload function")
+# Test 4: Show expected code
+print("Test 4: Expected code in upload function")
 print("-" * 60)
-print("The upload function should have these lines:")
+print("The upload function should have:")
+print()
+print("    import tempfile  # at the top")
 print()
 print("    safe_filename = os.path.basename(file.filename)")
-print("    temp_path = os.path.join('/tmp', safe_filename)")
+print("    temp_dir = tempfile.gettempdir()")
+print("    temp_path = os.path.join(temp_dir, safe_filename)")
 print()
 
-# Test 4: Instructions
-print("\nTest 4: Next Steps")
+# Test 5: Instructions
+print("Test 5: Next Steps")
 print("-" * 60)
-print("1. Check which app file you're running (app_faiss.py recommended)")
-print("2. Make sure you restarted the server after git pull")
-print("3. If still failing, send me the output of this script")
+print("1. Run: git pull origin master")
+print("2. Restart your Flask server")
+print("3. Try uploading a file")
 print()
-print("To check which process is running:")
-print("  Windows: tasklist | findstr python")
-print("  Linux/Mac: ps aux | grep python")
+print("If it still fails, the issue is somewhere else.")
+print("Send me the FULL error message from the browser console.")
 print()
 print("=" * 60)
