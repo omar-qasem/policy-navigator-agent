@@ -198,7 +198,9 @@ def upload_file():
     
     try:
         # Save file temporarily
-        temp_path = os.path.join('/tmp', file.filename)
+        # Use basename to handle Windows paths with backslashes
+        safe_filename = os.path.basename(file.filename)
+        temp_path = os.path.join('/tmp', safe_filename)
         file.save(temp_path)
         
         # Process based on file type
