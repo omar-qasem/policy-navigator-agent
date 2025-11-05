@@ -562,9 +562,9 @@
                 <div class="upload-area" id="upload-area" onclick="document.getElementById('file-input').click()">
                     <div class="upload-icon">📁</div>
                     <div style="font-weight: 600; margin-bottom: 0.5rem;">Click to upload or drag and drop</div>
-                    <div style="color: var(--text-secondary); font-size: 0.875rem;">XML, TXT files (max 16MB)</div>
+                    <div style="color: var(--text-secondary); font-size: 0.875rem;">XML, TXT, PDF files (max 16MB)</div>
                 </div>
-                <input type="file" id="file-input" accept=".xml,.txt" style="display: none;" onchange="uploadFile()">
+                <input type="file" id="file-input" accept=".xml,.txt,.pdf" style="display: none;" onchange="uploadFile()">
                 
                 <div class="spinner" id="upload-spinner"></div>
                 <div class="success-message" id="upload-success"></div>

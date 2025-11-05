@@ -8,6 +8,7 @@ from flask_cors import CORS
 from datetime import datetime
 import sys
 import os
+import PyPDF2
 
 # Add parent directory to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -207,8 +208,16 @@ def upload_file():
             with open(temp_path, 'r', encoding='utf-8') as f:
                 content = f.read()
             sections = [{'content': content, 'title': file.filename, 'section_number': '1'}]
+        elif file.filename.endswith('.pdf'):
+            # Extract text from PDF
+            with open(temp_path, 'rb') as f:
+                pdf_reader = PyPDF2.PdfReader(f)
+                content = ''
+                for page_num, page in enumerate(pdf_reader.pages, 1):
+                    content += page.extract_text() + '\n'
+            sections = [{'content': content, 'title': file.filename, 'section_number': '1'}]
         else:
-            return jsonify({'error': 'Unsupported file type. Please upload XML or TXT files.'}), 400
+            return jsonify({'error': 'Unsupported file type. Please upload XML, TXT, or PDF files.'}), 400
         
         # Add to vector store
         documents = []
