@@ -6,7 +6,6 @@ This repository contains the source code and documentation for the Policy Naviga
 
 It leverages a powerful combination of local vector search, real-time API integrations, and web scraping to deliver comprehensive insights into the complex landscape of federal policy.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ---
 
@@ -126,12 +125,6 @@ Once the web demo is running, you can interact with the agent in several ways:
 * **Ask a Question**: Type a question into the main text area and click "Submit Query."
 * **Upload a Document**: Click the upload area to select a local `.xml`, `.txt`, or `.pdf` file. The agent will process and index its content.
 * **Extract from URL**: Enter a public URL and click "Extract Content." The agent will scrape the page and add its text to the knowledge base.
-
----
-
-## ⚖️ License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ---
 
