@@ -204,7 +204,9 @@ def upload_file():
     
     try:
         # Save file temporarily
-        temp_path = os.path.join('/tmp', file.filename)
+        # Use basename to handle Windows paths with backslashes
+        safe_filename = os.path.basename(file.filename)
+        temp_path = os.path.join('/tmp', safe_filename)
         file.save(temp_path)
         
         # Process based on file type
@@ -214,8 +216,17 @@ def upload_file():
             with open(temp_path, 'r', encoding='utf-8') as f:
                 content = f.read()
             sections = [{'content': content, 'title': file.filename, 'section_number': '1'}]
+        elif file.filename.endswith('.pdf'):
+            # Extract text from PDF
+            import PyPDF2
+            with open(temp_path, 'rb') as f:
+                pdf_reader = PyPDF2.PdfReader(f)
+                content = ''
+                for page_num, page in enumerate(pdf_reader.pages, 1):
+                    content += page.extract_text() + '\n'
+            sections = [{'content': content, 'title': file.filename, 'section_number': '1'}]
         else:
-            return jsonify({'error': 'Unsupported file type. Please upload XML or TXT files.'}), 400
+            return jsonify({'error': 'Unsupported file type. Please upload XML, TXT, or PDF files.'}), 400
         
         # Add to vector store
         documents = []

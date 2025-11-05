@@ -157,7 +157,9 @@ def upload_document():
         upload_dir = '/tmp/policy_uploads'
         os.makedirs(upload_dir, exist_ok=True)
         
-        filepath = os.path.join(upload_dir, file.filename)
+        # Use basename to handle Windows paths with backslashes
+        safe_filename = os.path.basename(file.filename)
+        filepath = os.path.join(upload_dir, safe_filename)
         file.save(filepath)
         
         # Process document
