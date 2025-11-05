@@ -214,13 +214,29 @@ def upload_file():
                 content = f.read()
             sections = [{'content': content, 'title': file.filename, 'section_number': '1'}]
         elif file.filename.endswith('.pdf'):
-            # Extract text from PDF
+            # Extract text from PDF with chunking for large files
+            sections = []
             with open(temp_path, 'rb') as f:
                 pdf_reader = PyPDF2.PdfReader(f)
-                content = ''
-                for page_num, page in enumerate(pdf_reader.pages, 1):
-                    content += page.extract_text() + '\n'
-            sections = [{'content': content, 'title': file.filename, 'section_number': '1'}]
+                total_pages = len(pdf_reader.pages)
+                
+                # Chunk size: 10 pages per section for better indexing
+                chunk_size = 10
+                
+                for chunk_start in range(0, total_pages, chunk_size):
+                    chunk_end = min(chunk_start + chunk_size, total_pages)
+                    chunk_content = ''
+                    
+                    for page_num in range(chunk_start, chunk_end):
+                        page_text = pdf_reader.pages[page_num].extract_text()
+                        chunk_content += f"[Page {page_num + 1}]\n{page_text}\n\n"
+                    
+                    if chunk_content.strip():  # Only add non-empty chunks
+                        sections.append({
+                            'content': chunk_content,
+                            'title': f"{file.filename} (Pages {chunk_start + 1}-{chunk_end})",
+                            'section_number': f"chunk_{chunk_start + 1}_{chunk_end}"
+                        })
         else:
             return jsonify({'error': 'Unsupported file type. Please upload XML, TXT, or PDF files.'}), 400
         
