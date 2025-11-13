@@ -26,7 +26,7 @@ else:
     print(f"✗ .env file NOT found")
     print("  Creating .env file...")
     with open(env_path, 'w') as f:
-        f.write("AIXPLAIN_API_KEY=ada6267c2fbef32d4178f00df6462c7b1558d161790894ce51725f62309b3aa3\n")
+        f.write("AIXPLAIN_API_KEY=Your API\n")
     print("  ✓ .env file created")
 
 print()
